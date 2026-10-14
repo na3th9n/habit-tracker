@@ -1,38 +1,39 @@
 import './App.css'
 import { useState, useEffect } from 'react'
+import type { Habit } from '@habit-tracker/shared'
 
-interface habitsJson {
-  data: habits[],
+// CONSTANTS
+const habits_url = "http://localhost:3001/habits";
+
+// API Handlers
+async function getHabits(): Promise<Habit[]> {
+  const res = await fetch(habits_url)
+  if (!res.ok) throw new Error(`GET /habits failed: ${res.status}`)
+  return res.json();
 }
 
-interface habits {
-  habit: string,
-  completed: boolean,
-}
+async function postHabits(name: string): Promise<Habit> {
+  const config = {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ name: name })
+  };
 
+  const res = await fetch(habits_url, config);
+  if (!res.ok) throw new Error(`POST /habits failed: ${res.status}`)
+  return res.json();
+}
+;
 function App() {
   const [habitInput, setHabitInput] = useState<string>("");
-  const [habits, setHabits] = useState<habits[]>([]);
+  const [habits, setHabits] = useState<Habit[]>([]);
 
   useEffect(() => {
-    console.log("Effect");
-    // Effects are used to connect to external systems since it occurs after the component renders on the DOM
-    // fetch habits
-    try {
-      const habitsJson: habitsJson = {
-        data: [
-          { habit: "fake-habit-1", completed: true },
-          { habit: "fake-habit-2", completed: false },
-          { habit: "fake-habit-3", completed: true },
-        ]
-      };
-
-      const res = habitsJson.data;
-
-      setHabits(res);
-    } catch {
-      console.log("Error");
-    }
+    getHabits()
+      .then((res) => setHabits(res))
+      .catch((e) => console.error(e))
   }, [])
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
@@ -42,17 +43,13 @@ function App() {
   function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
 
-    // TODO: Re-make to a POST request to the server
-    try {
-      setHabits([...habits, { habit: habitInput, completed: false }]);
-      setHabitInput("");
-    } catch {
-      console.log("Future error here");
-    }
+    postHabits(habitInput)
+      .then((habit) => {
+        setHabits([...habits, habit]);
+        setHabitInput("");
+      })
+      .catch((e) => console.error(e));
   }
-  // next time, how do I make the table update once you submit a form?
-  // if you submit the form, it sends a POST request and changes habitsJson
-  // do we have to do another GET request then or can we have a cache to restrict antoher network call
 
   return (
     <>
@@ -79,12 +76,12 @@ function App() {
           <th>Habit</th>
           <th>1</th>
         </tr>
-        {habits.map((val, key) => {
+        {habits.map((habit) => {
           return (
-            <tr key={key}>
-              <th>{val.habit}</th>
+            <tr key={habit.id}>
+              <th>{habit.name}</th>
               <th>
-                <input type="checkbox" defaultChecked={val.completed} />
+                <input type="checkbox" defaultChecked={habit.completed} />
               </th>
             </tr>
           )
