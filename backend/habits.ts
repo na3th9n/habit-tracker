@@ -4,6 +4,7 @@ import express, {
   type Response,
   type NextFunction,
 } from "express";
+import type { Habit } from "@habit-tracker/shared";
 
 // type
 interface habits {
@@ -13,7 +14,7 @@ interface habits {
 }
 
 // habit data
-let habits: habits[] = [
+let habits: Habit[] = [
   { id: 1, name: "fake-habit-1", completed: true },
   { id: 2, name: "fake-habit-2", completed: false },
   { id: 3, name: "fake-habit-3", completed: true },

@@ -1,5 +1,9 @@
 import express, { type ErrorRequestHandler } from "express";
 import habitsRouter from "./habits.js";
+import cors from "cors";
+
+// CORS
+const origin_url = "http://localhost:5173"; // TODO: make this into a .ENV or maybe not since the urls we accept will be public technically
 
 // Create the express application
 
@@ -8,6 +12,9 @@ const app = express();
 const port = process.env.PORT || 3001;
 
 // Middleware Functions
+
+// CORS Middleware
+app.use(cors({ origin: origin_url }));
 
 // Error Handlers
 
