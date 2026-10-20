@@ -1,6 +1,7 @@
 import './App.css'
 import { useState, useEffect } from 'react'
 import type { Habit } from '@habit-tracker/shared'
+import CsvExport from './components/CsvExport.tsx'
 
 // CONSTANTS
 const habits_url = "http://localhost:3001/habits";
@@ -25,8 +26,20 @@ async function postHabits(name: string): Promise<Habit> {
   if (!res.ok) throw new Error(`POST /habits failed: ${res.status}`)
   return res.json();
 }
+
+// async function postCompleted() {
+//   res = fetch(habits_url, 
+//     {
+//       method: "POST",
+//       headers: {
+//         "Content-Type": "application/json"
+//       },
+//       body: JSON.stringify({  })
+//     }
+//   )
+// }
 ;
-function App() {
+function HabitTracker() {
   const [habitInput, setHabitInput] = useState<string>("");
   const [habits, setHabits] = useState<Habit[]>([]);
 
@@ -35,6 +48,10 @@ function App() {
       .then((res) => setHabits(res))
       .catch((e) => console.error(e))
   }, [])
+
+  // function handleCheckboxEvent(e: React.ChangeEvent<HTMLInputElement>) {
+  //
+  // }
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setHabitInput(e.target.value);
@@ -53,6 +70,7 @@ function App() {
 
   return (
     <>
+      <CsvExport />
       <div>New Habit</div>
       <form onSubmit={handleSubmit}>
         <label>Enter your new habit:
@@ -72,23 +90,27 @@ function App() {
 
       <div>Habit Tracker</div>
       <table>
-        <tr>
-          <th>Habit</th>
-          <th>1</th>
-        </tr>
-        {habits.map((habit) => {
-          return (
-            <tr key={habit.id}>
-              <th>{habit.name}</th>
-              <th>
-                <input type="checkbox" defaultChecked={habit.completed} />
-              </th>
-            </tr>
-          )
-        })}
+        <thead>
+          <tr>
+            <th>Habit</th>
+            <th>1</th>
+          </tr>
+        </thead>
+        <tbody>
+          {habits.map((habit) => {
+            return (
+              <tr key={habit.id}>
+                <td>{habit.name}</td>
+                <td>
+                  <input type="checkbox" defaultChecked={habit.completed} />
+                </td>
+              </tr>
+            )
+          })}
+        </tbody>
       </table>
     </>
   )
 }
 
-export default App
+export default HabitTracker
