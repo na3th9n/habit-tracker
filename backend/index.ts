@@ -1,6 +1,6 @@
 import express, { type ErrorRequestHandler } from "express";
-import habitsRouter from "./habits.js";
 import cors from "cors";
+import workoutsRouter from "./workouts.js";
 
 // CORS
 const origin_url = "http://localhost:5173"; // TODO: make this into a .ENV or maybe not since the urls we accept will be public technically
@@ -43,7 +43,7 @@ app.get("/error", (req, res) => {
   throw new Error("Fake error");
 });
 
-app.use("/habits", habitsRouter);
+app.use("/workouts", workoutsRouter);
 
 // Initiate Error Handling
 
