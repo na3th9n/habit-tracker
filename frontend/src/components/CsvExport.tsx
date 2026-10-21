@@ -1,10 +1,12 @@
 import { useState, type ChangeEvent } from 'react'
 import Papa from 'papaparse'
+import { type Workout } from '@habit-tracker/shared'
 
-export default function CsvExport() {
-  type ParsedData = Record<string, string>
+interface CsvExportProps {
+  onSet: (data: Workout[]) => void
+}
 
-  const [data, setData] = useState<ParsedData[] | null>(null);
+export default function CsvUpload({ onSet }: CsvExportProps) {
   const [error, setError] = useState<string | null>(null);
 
   function handleFileUpload(e: ChangeEvent<HTMLInputElement>) {
@@ -16,17 +18,19 @@ export default function CsvExport() {
       return;
     }
 
-    Papa.parse<ParsedData>(file, {
+    Papa.parse<Workout>(file, {
       header: true,
       encoding: 'UTF-8',
       complete: (result) => {
         if (result.data.length === 0) {
           setError("Error. File is empty.");
-          setData(null)
+          onSet([]);
+          return;
         }
 
         setError(null);
-        setData(result.data);
+        console.log(result.data)
+        onSet(result.data);
       },
       error: (error) => {
         setError(`Parsing Error. ${error.message}`)
@@ -38,13 +42,6 @@ export default function CsvExport() {
     <div>
       <input type="file" accept=".csv" onChange={handleFileUpload} />
       {error && <p>{error}</p>}
-      {data && (
-        <div>
-          <p>
-            Loaded Data: {data.length} rows
-          </p>
-        </div>
-      )}
     </div>
   )
 }
